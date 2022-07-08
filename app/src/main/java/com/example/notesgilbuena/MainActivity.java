@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -11,20 +12,40 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.security.Key;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-    ArrayList<String> notes;
-    ArrayAdapter<String> notes_adapter;
+    ArrayList<Note> notes;
+    ArrayAdapter<Note> notes_adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         setListAdapterMethod();
+        etNoteListenerMethod();
         btnAddListenerMethod();
     }
 
+    private void etNoteListenerMethod(){
+        EditText etNote = findViewById(R.id.etNote);
+        etNote.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View view, int i, KeyEvent keyEvent) {
+                if (keyEvent.getAction() == KeyEvent.ACTION_DOWN ||
+                        keyEvent.getAction() == KeyEvent.KEYCODE_ENTER ||
+                        keyEvent.getAction() == KeyEvent.KEYCODE_NUMPAD_ENTER) {
+                    String note = etNote.getText().toString();
+                    notes.add(new Note(note));
+                    notes_adapter.notifyDataSetChanged();
+                    etNote.setText("");
+                    return true;
+                }
+                    return false;
+            }
+        });
+    }
     private void btnAddListenerMethod() {
         Button btnAdd = findViewById(R.id.btnAdd);
         btnAdd.setOnClickListener(new View.OnClickListener() {
@@ -32,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 EditText etNote = findViewById(R.id.etNote);
                 String note = etNote.getText().toString();
-                notes.add(note);
+                notes.add(new Note(note));
                 notes_adapter.notifyDataSetChanged();
                 etNote.setText("");
             }
@@ -42,13 +63,13 @@ public class MainActivity extends AppCompatActivity {
     private void setListAdapterMethod() {
         ListView lvList = findViewById(R.id.lvList);
         notes = new ArrayList<>();
-        notes.add("First Note");
-        notes.add("Second Note");
+        notes.add(new Note("First Note"));
+        notes.add(new Note("Second Note"));
 
         notes_adapter =
                 new ArrayAdapter<>(getBaseContext(), android.R.layout.simple_list_item_1, notes);
         lvList.setAdapter(notes_adapter);
 
-        notes.add("Chelter Matthew Gilbuena");
+        notes.add(new Note("Chelter Matthew Gilbuena"));
     }
 }
